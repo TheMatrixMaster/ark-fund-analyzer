@@ -3,14 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <title>ARK ETF Analysis</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 </head>
-<body>
+<body style="padding: 2%">
   <div>
-    <h1>Please input the latest ARK csv file</h1>
+    <h1>ARK Fund ETF Analyzer</h1>
+    <p id="update">{{ update }}</p>
   </div>
-  <form action="" method="post" enctype="multipart/form-data">
-    <input type="file" id="file" name="file" accept="text/csv">
-    <input type="submit" value="Submit">
-  </form>
+  <div style="display: flex">
+    <form style="padding: 4px 0 4px 0" action="{{ url_for('manage_data') }}" method="post" enctype="multipart/form-data">
+      <input type="file" id="file" name="file" accept="text/csv"><br/>
+      <input type="submit" value="Submit">
+    </form>
+    <form action="{{ url_for('delete_data') }}" method="get" enctype="multipart/form-data">
+      <input type="submit" value="Delete All Data">
+    </form>
+  </div>
+  {% for fund in data %}
+    <div style="padding: 20px 0 20px 0">
+      <h5>{{ fund.fund }}</h5>
+      <form action="{{ url_for('gen_report', fund=fund.fund) }}" method="get">
+        <button>Get Report</button>
+      </form>
+      <form action="{{ url_for('delete_data', fund=fund.fund) }}" method="get">
+        <button>Delete Data</button>
+      </form>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Fund</th>
+            <th>Publication Date</th>
+            <th>Upload Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in fund.data %}
+            <tr>
+              <td>{{ row['fund'] }}</td>
+              <td>{{ row['date']|tojson|safe }}</td>
+              <td>{{ row['timestamp']|tojson|safe }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endfor %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 </body>
 </html>
